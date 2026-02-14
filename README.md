@@ -408,16 +408,6 @@ Le fichier `database/init.sql` contient le script complet de création et les do
 
 ---
 
-## 👥 Répartition des tâches
-
-| Membre   | Fonctionnalités réalisées                                               |
-|----------|-------------------------------------------------------------------------|
-| Membre 1 | Auth (signup, login, JWT), middleware, BDD, rôles utilisateur           |
-| Membre 2 | Réservations (CRUD complet), gestion des tables, logique d'attribution  |
-| Membre 3 | Menu (CRUD + filtres), créneaux horaires, documentation, validation     |
-
----
-
 ## 📄 Licence
 
 Projet réalisé dans le cadre d'un projet pédagogique — API avec Node.js.
