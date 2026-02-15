@@ -65,9 +65,9 @@ CREATE TABLE opening_slots (
 
 --Les mots de passe sont des hash bcrypt round 10
 INSERT INTO users (email, password_hash, fname, lname, phone, role) VALUES
-('admin@resto.com',   '$2b$10$8KzQxW6Z5e0vXJZqK3m3QOe5v1f2g3h4i5j6k7l8m9n0o1p2q3r4s', 'Pierre', 'Martin', '0601020304', 'admin'),
-('marie@example.com', '$2b$10$9LaRyX7A6f1wYK0rL4n4RPf6w2g4h5i6j7k8l9m0n1o2p3q4r5s6t', 'Marie', 'Durand', '0611223344', 'client'),
-('jean@example.com',  '$2b$10$0MbSzY8B7g2xZL1sM5o5SQg7x3h5i6j7k8l9m0n1o2p3q4r5s6t7u', 'Jean', 'Dupont', '0622334455', 'client');
+('admin@resto.com',   '$2b$10$KeEchWQm9VX.Szgxk.zgpeKrcmJQ1SWN.PJznDqGEza3U3CNI2nWa', 'Pierre', 'Martin', '0601020304', 'admin'),
+('marie@example.com', '$2b$10$iHaUYFHckoMb9vghC/gap.DGPU70/QpCxe9n9Q0Ghmv/.NNBU3MWa', 'Marie', 'Durand', '0611223344', 'client'),
+('jean@example.com',  '$2b$10$iHaUYFHckoMb9vghC/gap.DGPU70/QpCxe9n9Q0Ghmv/.NNBU3MWa', 'Jean', 'Dupont', '0622334455', 'client');
 
 
 INSERT INTO `tables` (seats, label) VALUES
