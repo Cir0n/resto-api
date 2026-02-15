@@ -64,6 +64,7 @@ CREATE TABLE opening_slots (
 );
 
 --Les mots de passe sont des hash bcrypt round 10
+DELETE FROM users;
 INSERT INTO users (email, password_hash, fname, lname, phone, role) VALUES
 ('admin@resto.com',   '$2b$10$KeEchWQm9VX.Szgxk.zgpeKrcmJQ1SWN.PJznDqGEza3U3CNI2nWa', 'Pierre', 'Martin', '0601020304', 'admin'),
 ('marie@example.com', '$2b$10$iHaUYFHckoMb9vghC/gap.DGPU70/QpCxe9n9Q0Ghmv/.NNBU3MWa', 'Marie', 'Durand', '0611223344', 'client'),
