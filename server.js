@@ -1,7 +1,8 @@
 require('dotenv').config();
-const db = require('./db');
+const db = require('./config/db');
 const express = require('express');
 const authRoutes = require('./routes/authRoutes');
+const reservationRoutes = require('./routes/reservationRoutes');
 
 const app = express();
 const PORT = process.env.PORT;
@@ -9,6 +10,7 @@ const PORT = process.env.PORT;
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
+app.use('/api/reservations', reservationRoutes);
 
 
 async function startServer() {
