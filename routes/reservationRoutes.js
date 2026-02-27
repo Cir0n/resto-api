@@ -45,6 +45,54 @@ router.get('/my-reservations', authMiddleware, async (req, res) => {
     }
 });
 
+router.put('/:id', authMiddleware, async (req, res) => {
+    const reservationId = req.params.id;
+    const userId = req.user.id;
+    const { date, time, number_of_people, note } = req.body;
+    try {
+        const [rows] = await pool.query(
+            'SELECT status FROM reservations WHERE id = ? AND user_id = ?',
+            [reservationId, userId]
+        );
+        
+        if (rows[0].status === 'cancelled') {
+            return res.status(400).json({ message: 'Cannot update a cancelled reservation' });
+        }
+
+        const [result] = await pool.query(
+            'UPDATE reservations SET date = ?, time = ?, number_of_people = ?, note = ? WHERE id = ? AND user_id = ?',
+            [date, time, number_of_people, note, reservationId, userId]
+        );
+        res.status(200).json({ message: 'Reservation updated' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+router.delete('/:id', authMiddleware, async (req, res) => {
+    const reservationId = req.params.id;
+    const userId = req.user.id;
+    try {
+
+        const [rows] = await pool.query(
+            'SELECT status FROM reservations WHERE id = ? AND user_id = ?',
+            [reservationId, userId]
+        );
+
+        if (rows[0].status === 'cancelled') {
+            return res.status(400).json({ message: 'Reservation is already cancelled' });
+        }
+
+        const [result] = await pool.query(
+            'UPDATE reservations SET status = "cancelled" WHERE id = ? AND user_id = ?',
+            [reservationId, userId]
+        );
+        res.status(200).json({ message: 'Reservation cancelled' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 
 
 module.exports = router;
