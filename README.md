@@ -84,10 +84,8 @@ cp .env.example .env
 mysql -u root -p < database/init.sql
 
 # 5. Lancer le serveur
-npm start
+node server.js
 
-# Ou en mode développement (avec nodemon)
-npm run dev
 ```
 
 ### Variables d'environnement (.env)
