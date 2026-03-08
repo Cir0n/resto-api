@@ -43,17 +43,14 @@ resto-api/
 │   ├── authRoutes.js
 │   ├── reservationRoutes.js
 │   ├── menuRoutes.js
-│   └── tableRoutes.js
 ├── controllers/
 │   ├── authController.js
 │   ├── reservationController.js
 │   ├── menuController.js
 │   └── tableController.js
-└── models/
-    ├── userModel.js
-    ├── reservationModel.js
-    ├── menuModel.js
-    └── tableModel.js
+└── business/
+    ├── reservationManager.js # Logique métier pour les réservations
+    └── tableManager.js       # Logique métier pour les tables
 ```
 
 ---
@@ -74,14 +71,14 @@ git clone https://github.com/votre-groupe/resto-api.git
 cd resto-api
 
 # 2. Installer les dépendances
-npm install
+npm install express mysql2 dotenv bcryptjs jsonwebtoken express-validator
 
 # 3. Configurer les variables d'environnement
 cp .env.example .env
 # Éditer le fichier .env avec vos paramètres
 
 # 4. Créer la base de données
-mysql -u root -p < database/init.sql
+aller dans le fichier database/init.sql
 
 # 5. Lancer le serveur
 node server.js
@@ -101,6 +98,25 @@ JWT_EXPIRES_IN=24h
 ```
 
 ---
+
+## 📦 Installation des dépendances
+Si vous partez d'un projet vide ou si vous souhaitez réinstaller manuellement les modules nécessaires, exécutez la commande suivante :
+
+```bash
+npm install express mysql2 dotenv bcryptjs jsonwebtoken express-validator
+```
+
+Détails des paquets installés :
+
+express : Framework web pour construire l'API.
+
+mysql2 : Client pour connecter et interroger la base de données MySQL.
+
+dotenv : Gestion des variables d'environnement (fichier .env).
+
+bcryptjs : Hachage sécurisé des mots de passe utilisateurs.
+
+jsonwebtoken : Génération et vérification des tokens JWT pour l'authentification.
 
 ## 🔐 Comptes de test
 
@@ -352,6 +368,8 @@ Toutes les routes protégées nécessitent un header `Authorization` :
 Authorization: Bearer <votre_token_jwt>
 ```
 
+Conseil: setup une collection de requetes parent avec `Authorization: Bearer <votre_token_jwt>`,
+et toutes les requetes enfant en `inherit auth from parent`.
 Le token est obtenu via `POST /login`.
 
 ---

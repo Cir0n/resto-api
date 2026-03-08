@@ -26,7 +26,7 @@ CREATE TABLE reservations (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     number_of_people INT NOT NULL,
-    date DATE NOT NULL,
+    day_of_week ENUM('lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche') NOT NULL,
     time TIME NOT NULL,
     status ENUM('pending', 'confirmed', 'cancelled') DEFAULT 'pending',
     note TEXT,
@@ -59,8 +59,16 @@ CREATE TABLE opening_slots (
     id INT AUTO_INCREMENT PRIMARY KEY,
     day_of_week ENUM('lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche') NOT NULL,
     time TIME NOT NULL,
-    is_available BOOLEAN DEFAULT TRUE,
     comment VARCHAR(255)
+);
+
+CREATE TABLE opening_slots_tables (
+    opening_slot_id INT NOT NULL,
+    table_id INT NOT NULL,
+    is_reserved BOOLEAN DEFAULT FALSE,
+    PRIMARY KEY (opening_slot_id, table_id),
+    FOREIGN KEY (opening_slot_id) REFERENCES opening_slots(id) ON DELETE CASCADE,
+    FOREIGN KEY (table_id) REFERENCES `tables`(id) ON DELETE CASCADE
 );
 
 --Les mots de passe sont des hash bcrypt round 10
@@ -110,34 +118,29 @@ INSERT INTO menu_items (name, description, price, category) VALUES
 ('Thé parfumé',              'Sélection de thés : Earl Grey, menthe, jasmin',     3.50,  'Boissons');
 
 
-INSERT INTO opening_slots (day_of_week, time, is_available) VALUES
+INSERT INTO opening_slots (day_of_week, time) VALUES
 
-('lundi', '12:00:00', FALSE),
-('lundi', '19:00:00', FALSE),
-
-
-('mardi',    '12:00:00', TRUE),
-('mardi',    '13:00:00', TRUE),
-('mardi',    '19:00:00', TRUE),
-('mardi',    '20:30:00', TRUE),
-('mercredi', '12:00:00', TRUE),
-('mercredi', '13:00:00', TRUE),
-('mercredi', '19:00:00', TRUE),
-('mercredi', '20:30:00', TRUE),
-('jeudi',    '12:00:00', TRUE),
-('jeudi',    '13:00:00', TRUE),
-('jeudi',    '19:00:00', TRUE),
-('jeudi',    '20:30:00', TRUE),
-('vendredi', '12:00:00', TRUE),
-('vendredi', '13:00:00', TRUE),
-('vendredi', '19:00:00', TRUE),
-('vendredi', '20:30:00', TRUE),
+('lundi', '12:00:00'),
+('lundi', '19:00:00'),
 
 
-('samedi', '19:00:00', TRUE),
-('samedi', '20:30:00', TRUE),
-('samedi', '21:30:00', TRUE),
+('mardi',    '12:00:00'),
+('mardi',    '19:00:00'),
+('mercredi', '13:00:00'),
+('mercredi', '20:30:00'),
+('jeudi',    '13:00:00'),
+('jeudi',    '19:00:00'),
+('vendredi', '12:00:00'),
+('vendredi', '20:30:00'),
 
 
-('dimanche', '12:00:00', TRUE),
-('dimanche', '13:00:00', TRUE);
+('samedi', '19:00:00'),
+('samedi', '21:30:00'),
+
+
+('dimanche', '12:00:00');
+
+INSERT INTO opening_slots_tables (opening_slot_id, table_id, is_reserved)
+SELECT os.id, t.id, FALSE
+FROM opening_slots os
+CROSS JOIN `tables` t;
