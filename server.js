@@ -5,6 +5,7 @@ const authRoutes = require('./routes/authRoutes');
 const reservationRoutes = require('./routes/reservationRoutes');
 const menuRoutes = require('./routes/menuRoutes');
 
+
 const app = express();
 const PORT = process.env.PORT;
 
@@ -13,6 +14,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/reservations', reservationRoutes);
 app.use('/api/menu', menuRoutes);
+
 
 async function startServer() {
   try {
