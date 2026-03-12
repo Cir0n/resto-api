@@ -1,9 +1,10 @@
 {
   "info": {
-    "_postman_id": "4022bb75-8e3c-4929-8d0b-a50d1278e52e",
+    "_postman_id": "c941d003-569d-4990-8278-8f81b8a20239",
     "name": "resto-api",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "36573638"
+    "_exporter_id": "48881756",
+    "_collection_link": "https://go.postman.co/collection/48881756-c941d003-569d-4990-8278-8f81b8a20239?source=collection_link"
   },
   "item": [
     {
@@ -16,7 +17,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"email\": \"marie@example.com\",\r\n    \"password\": \"Client123!\"\r\n}",
+              "raw": "{\r\n    \"email\": \"marie@example.com\",\r\n    \"password\": \"Client123!\"\r\n    //\"email\": \"admin@resto.com\",\r\n    //\"password\": \"Admin123!\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -24,12 +25,12 @@
               }
             },
             "url": {
-              "raw": "http://localhost:3000/api/auth/login",
+              "raw": "http://localhost:3302/api/auth/login",
               "protocol": "http",
               "host": [
                 "localhost"
               ],
-              "port": "3000",
+              "port": "3302",
               "path": [
                 "api",
                 "auth",
@@ -47,25 +48,15 @@
         {
           "name": "Récupérer les réservations ADMIN(GET /)",
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjExLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NzEyMzQyMTIsImV4cCI6MTc3MTIzNzgxMn0.5ybLMO8OSYNMqV31f6w9IRbkKtpeX_PLls6m_-3Sdmc",
-                  "type": "string"
-                }
-              ]
-            },
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/api/reservations",
+              "raw": "http://localhost:3302/api/reservations",
               "protocol": "http",
               "host": [
                 "localhost"
               ],
-              "port": "3000",
+              "port": "3302",
               "path": [
                 "api",
                 "reservations"
@@ -77,21 +68,11 @@
         {
           "name": "Créer une réservation (POST /create)",
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEyLCJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzcxMjMzOTgyLCJleHAiOjE3NzEyMzc1ODJ9.aZVrBYRMrhDNgRBhUV44NV-VNi_lBEOyf0l0B5012_0",
-                  "type": "string"
-                }
-              ]
-            },
             "method": "POST",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"date\":\"2026-02-16\",\r\n    \"time\": \"12:00:00\",\r\n    \"number_of_people\": \"4\",\r\n    \"note\": \"Allergie au lactose\"\r\n}",
+              "raw": "{\r\n    \"day_of_week\":\"lundi\",\r\n    \"time\": \"12:00:00\",\r\n    \"number_of_people\": \"6\",\r\n    \"date\": \"11/03/2026\",\r\n    \"note\": \"nothing\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -99,12 +80,12 @@
               }
             },
             "url": {
-              "raw": "http://localhost:3000/api/reservations/create",
+              "raw": "http://localhost:3302/api/reservations/create",
               "protocol": "http",
               "host": [
                 "localhost"
               ],
-              "port": "3000",
+              "port": "3302",
               "path": [
                 "api",
                 "reservations",
@@ -117,25 +98,15 @@
         {
           "name": "Récupérer ces réservation (GET /my-reservations)",
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEyLCJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzcxMjM0NjUyLCJleHAiOjE3NzEyMzgyNTJ9.WhT4o8jCGmi132uFin_mS2DF8RpA1LmKvmQZXFZdajg",
-                  "type": "string"
-                }
-              ]
-            },
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/api/reservations/my-reservations",
+              "raw": "http://localhost:3302/api/reservations/my-reservations",
               "protocol": "http",
               "host": [
                 "localhost"
               ],
-              "port": "3000",
+              "port": "3302",
               "path": [
                 "api",
                 "reservations",
@@ -148,25 +119,15 @@
         {
           "name": "Annuler une réservation (DELETE /:id)",
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEyLCJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzcyMjA1MzIwLCJleHAiOjE3NzIyMDg5MjB9.vwssZBOQRiiaVBpzf2f7vSySvb12IMhikSk-qIqK2o0",
-                  "type": "string"
-                }
-              ]
-            },
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/api/reservations/:id",
+              "raw": "http://localhost:3302/api/reservations/:id",
               "protocol": "http",
               "host": [
                 "localhost"
               ],
-              "port": "3000",
+              "port": "3302",
               "path": [
                 "api",
                 "reservations",
@@ -175,8 +136,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "2",
-                  "type": "string"
+                  "value": "27"
                 }
               ]
             }
@@ -184,11 +144,8 @@
           "response": []
         },
         {
-          "name": "http://localhost:3000/api/reservations/3",
+          "name": "Modifier une réservation (PUT /:id)",
           "request": {
-            "auth": {
-              "type": "noauth"
-            },
             "method": "PUT",
             "header": [
               {
@@ -198,7 +155,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"date\": \"2026-02-16\",\n  \"time\": \"12:00:00\",\n  \"number_of_people\": 4,\n  \"note\": \"Allergie au lactose\"\n}",
+              "raw": "{\n    \"time\": \"12:00:00\",\n    \"number_of_people\": \"12\",\n    \"date\": \"March 25, 2026\",\n    \"note\": \"Allergie au lactose\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -206,16 +163,50 @@
               }
             },
             "url": {
-              "raw": "http://localhost:3000/api/reservations/3",
+              "raw": "http://localhost:3302/api/reservations/:id",
               "protocol": "http",
               "host": [
                 "localhost"
               ],
-              "port": "3000",
+              "port": "3302",
               "path": [
                 "api",
                 "reservations",
-                "3"
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "4"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Valider une réservation (PATCH /:id/validate)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3302/api/reservations/:id/validate",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3302",
+              "path": [
+                "api",
+                "reservations",
+                ":id",
+                "validate"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "8"
+                }
               ]
             }
           },
@@ -232,12 +223,12 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/api/menu",
+              "raw": "http://localhost:3302/api/menu",
               "protocol": "http",
               "host": [
                 "localhost"
               ],
-              "port": "3000",
+              "port": "3302",
               "path": [
                 "api",
                 "menu"
@@ -247,6 +238,155 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "ferie",
+      "item": [
+        {
+          "name": "Récuperer les jours feriés (GET /)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3302/api/ferie/",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3302",
+              "path": [
+                "api",
+                "ferie",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Récuperer un jour ferié (GET /:date)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3302/api/ferie/:date",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3302",
+              "path": [
+                "api",
+                "ferie",
+                ":date"
+              ],
+              "variable": [
+                {
+                  "key": "date",
+                  "value": "March 25, 2026"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Créer un jour ferié (PUT /CREATE)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"date\": \"March 25, 2026\",\r\n    \"description\": \"pentecote\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3302/api/ferie/create",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3302",
+              "path": [
+                "api",
+                "ferie",
+                "create"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Supprimer un jour ferié (DELETE /:date)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3302/api/ferie/:date",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3302",
+              "path": [
+                "api",
+                "ferie",
+                ":date"
+              ],
+              "variable": [
+                {
+                  "key": "date",
+                  "value": "March 25, 2026"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInJvbGUiOiJjbGllbnQiLCJpYXQiOjE3NzMzMTU2NzYsImV4cCI6MTc3MzMxOTI3Nn0.HgZDE62zktNq7Ho8hyGUMW7T-yAC8actoybo_AFz134",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
     }
   ]
 }
