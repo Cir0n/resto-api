@@ -2,7 +2,6 @@ const { logAction } = require('../Utils/logger');
 
 // Selectionne la/les tables de la reservation et renvoie leur ID
 async function assign(userId, connection, peopleToPlace, slotId, date){
-    console.log("execute type:", typeof connection.execute);
     const number_of_people = peopleToPlace; // keep original number for logging
         // Récupérer les tables libres pour ce créneau
         const [availableTables] = await connection.execute(`
@@ -76,11 +75,11 @@ async function assign(userId, connection, peopleToPlace, slotId, date){
                     break;
             }
         }
-        await logAction(userId, 'Table_Assignment', { 
+        await logAction(userId, 'Table_Assignment', {
             selectedTableIds : selectedTableIds,
             slotId: slotId,
-            date: date, 
-            number_of_people: number_of_people 
+            date: date,
+            number_of_people: number_of_people
         }, 'INFO');
         return selectedTableIds;
 }

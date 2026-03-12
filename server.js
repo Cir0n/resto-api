@@ -4,6 +4,7 @@ const express = require('express');
 const authRoutes = require('./routes/authRoutes');
 const reservationRoutes = require('./routes/reservationRoutes');
 const menuRoutes = require('./routes/menuRoutes');
+const ferieRoutes = require('./routes/ferieRoutes');
 
 
 const app = express();
@@ -14,6 +15,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/reservations', reservationRoutes);
 app.use('/api/menu', menuRoutes);
+app.use('/api/ferie', ferieRoutes);
 
 
 async function startServer() {

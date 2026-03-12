@@ -67,7 +67,7 @@ resto-api/
 
 ```bash
 # 1. Cloner le repo
-git clone https://github.com/votre-groupe/resto-api.git
+git clone https://github.com/Cir0n/resto-api.git
 cd resto-api
 
 # 2. Installer les dépendances
@@ -77,8 +77,12 @@ npm install express mysql2 dotenv bcryptjs jsonwebtoken express-validator
 cp .env.example .env
 # Éditer le fichier .env avec vos paramètres
 
-# 4. Créer la base de données
-aller dans le fichier database/init.sql
+# 4. Créer la base de données :
+# votre_port_database = 3306 de base
+# En shell
+Get-Content database/init.sql | mysql -u root -P <votre_port_database>
+# En cmd
+mysql -u root -P <votre_port_database> < database/init.sql
 
 # 5. Lancer le serveur
 node server.js
@@ -87,14 +91,20 @@ node server.js
 
 ### Variables d'environnement (.env)
 
+# votre_port_database = 3306 de base
+# votre_port_server = 3302 pour les requêtes de la collection postman
 ```env
-PORT=3000
+# DATABASE
+PORT=<votre_port_server>
 DB_HOST=localhost
 DB_USER=root
-DB_PASSWORD=votre_mot_de_passe
+DB_PASSWORD=""
 DB_NAME=resto_api
+DB_PORT=<votre_port_database>
+
+# JWT
 JWT_SECRET=votre_secret_jwt
-JWT_EXPIRES_IN=24h
+JWT_EXPIRES_IN=1h
 ```
 
 ---
@@ -103,7 +113,7 @@ JWT_EXPIRES_IN=24h
 Si vous partez d'un projet vide ou si vous souhaitez réinstaller manuellement les modules nécessaires, exécutez la commande suivante :
 
 ```bash
-npm install express mysql2 dotenv bcryptjs jsonwebtoken express-validator
+npm install
 ```
 
 Détails des paquets installés :
