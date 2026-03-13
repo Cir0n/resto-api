@@ -166,11 +166,19 @@ JWT_EXPIRES_IN=1h
 | Methode | Route                                   | Auth   | Description                     |
 |---------|-----------------------------------------|--------|---------------------------------|
 | POST    | `/api/reservations/create`              | Client | Creer une reservation           |
-| GET     | `/api/reservations`                     | Admin  | Toutes les reservations         |
+| GET     | `/api/reservations`                     | Admin  | Toutes les reservations (filtrable) |
 | GET     | `/api/reservations/my-reservations`     | Client | Ses propres reservations        |
 | PUT     | `/api/reservations/:id`                 | Client | Modifier une reservation        |
 | DELETE  | `/api/reservations/:id`                 | Client | Annuler une reservation         |
 | PATCH   | `/api/reservations/:id/validate`        | Admin  | Confirmer une reservation       |
+
+**GET /api/reservations — Filtres disponibles (query params, Admin) :**
+
+| Parametre | Type   | Description                                                   |
+|-----------|--------|---------------------------------------------------------------|
+| `date`    | string | Filtrer par date (format `YYYY-MM-DD`)                        |
+| `status`  | string | Filtrer par statut (`pending`, `confirmed`, `cancelled`)      |
+| `sort`    | string | Trier par champ (`date`, `status`, `number_of_people`)        |
 
 **POST /api/reservations/create**
 
@@ -243,18 +251,24 @@ Seules les reservations non annulees peuvent etre modifiees. Les tables sont rea
 | Methode | Route                    | Auth | Description                       |
 |---------|--------------------------|------|-----------------------------------|
 | GET     | `/api/menu`              | Non  | Tous les plats du menu            |
-| GET     | `/api/menu/:categoryId`  | Non  | Plats filtres par categorie       |
 
-**GET /api/menu**
+**Filtres disponibles (query params) :**
+
+| Parametre   | Type   | Description                          |
+|-------------|--------|--------------------------------------|
+| `category`  | string | Filtrer par nom de categorie (ex: `entrees`, `plats`, `desserts`) |
+| `max_price` | number | Filtrer par prix maximum             |
+
+**GET /api/menu?category=plats&max_price=20**
 
 ```json
 // Response 200
 [
   {
-    "id": 1,
-    "name": "Soupe a l'oignon",
-    "description": "Soupe gratinee traditionnelle au fromage",
-    "price": 8.50
+    "id": 7,
+    "name": "Risotto aux champignons",
+    "description": "Risotto cremeux aux cepes et parmesan",
+    "price": 16.00
   },
   ...
 ]
@@ -336,7 +350,9 @@ Format standard :
 - **opening_slots** — id, day_of_week, time, comment (creneaux uniques par jour+heure)
 - **reservations** — id, user_id, opening_slot_id, date, number_of_people, status, note, created_at, updated_at
 - **reservation_tables** — reservation_id, table_id (table de liaison)
-- **menu_items** — id, name, description, price, category, image
+- **menu_items** — id, name, description, price, image
+- **category** — id, name
+- **category_menu_items** — menu_items_id, category_id (table de liaison many-to-many)
 - **holidays** — id, date, description
 - **logs** — id, user_id, action, details, created_at
 
