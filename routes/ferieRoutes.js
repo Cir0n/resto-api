@@ -18,7 +18,7 @@ router.get('/', authMiddleware, async (req, res) => {
 });
 
 router.get('/:date', authMiddleware, async (req, res) => {
-        const date = new Date(req.body.date);
+       const date = new Date(req.params.date);;
     try {
         const [feries] = await pool.query('SELECT id, date, description FROM holidays WHERE date = ?', [date]);
         if (feries.length === 0) {
@@ -27,7 +27,7 @@ router.get('/:date', authMiddleware, async (req, res) => {
             throw err;
         }
         res.json(feries[0]);
-        await logAction(req.user.id, 'SUCCESSFUL_RETRIEVAL_OF_HOLIDAY', { id: req.params.id }, 'INFO');
+        await logAction(req.user.id, 'SUCCESSFUL_RETRIEVAL_OF_HOLIDAY', { date: req.params.date }, 'INFO');
     } catch (error) {
         await logAction(req.user.id, 'FAILED_TO_RETRIEVE_HOLIDAY', { error: error.message }, 'ERROR');
         res.status(error.errorCode || 500).json({ error: error.message });
