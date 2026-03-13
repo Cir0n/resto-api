@@ -231,7 +231,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
         }
 
         // Ré-assigner les tables
-        const selectedTableIds = await assign(connection, number_of_people, slotId, date);
+        const selectedTableIds = await assign(userId, connection, number_of_people, slotId, date);
 
         // Mettre à jour la réservation principale
         await connection.execute(
