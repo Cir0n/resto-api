@@ -61,6 +61,48 @@ CREATE TABLE menu_items (
     image VARCHAR(255)
 );
 
+CREATE TABLE category_menu_items (
+    menu_items_id INT NOT NULL,
+    category_id INT NOT NULL,
+    PRIMARY KEY (menu_items_id, category_id),
+    FOREIGN KEY (menu_items_id) REFERENCES menu_items(id) ON DELETE CASCADE,
+    FOREIGN KEY (category_id)       REFERENCES `category`(id)     ON DELETE CASCADE
+);
+
+CREATE TABLE `category` (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50)
+);
+
+
+INSERT INTO resto_api.category
+( name)
+VALUES('entrées'),
+('plats'),
+('desserts');
+
+
+INSERT INTO resto_api.category_menu_items
+(menu_items_id, category_id)
+VALUES(1, 1),
+(2, 1),
+(3, 1),
+(4, 1),
+(5, 1),
+(6, 1),
+(7, 2),
+(8, 2),
+(9, 2),
+(10, 2),
+(11, 2),
+(12, 3),
+(13, 3),
+(14, 3),
+(15, 3),
+(16, 3),
+(17, 3),
+(18, 3);
+
 
 -- Mots de passe : hash bcrypt round 10
 INSERT INTO users (email, password_hash, fname, lname, phone, role) VALUES
