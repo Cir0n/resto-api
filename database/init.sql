@@ -37,7 +37,6 @@ CREATE TABLE reservations (
     note TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
     FOREIGN KEY (user_id)        REFERENCES users(id)         ON DELETE CASCADE,
     FOREIGN KEY (opening_slot_id) REFERENCES opening_slots(id) ON DELETE RESTRICT
 );
@@ -57,7 +56,6 @@ CREATE TABLE menu_items (
     name VARCHAR(150) NOT NULL,
     description TEXT,
     price DECIMAL(6,2) NOT NULL,
-    category ENUM('Entrées','Plats','Desserts','Boissons') NOT NULL,
     image VARCHAR(255)
 );
 
@@ -135,25 +133,25 @@ INSERT INTO opening_slots (day_of_week, time) VALUES
 ('samedi',   '21:30:00'),
 ('dimanche', '12:00:00');
 
-INSERT INTO menu_items (name, description, price, category) VALUES
-('Soupe à l\'oignon',       'Soupe gratinée traditionnelle au fromage',          8.50,  'Entrées'),
-('Salade César',             'Salade romaine, poulet grillé, parmesan, croûtons', 10.00, 'Entrées'),
-('Terrine de campagne',      'Terrine maison servie avec cornichons et pain',     9.00,  'Entrées'),
-('Œuf cocotte',              'Œuf cocotte à la crème et aux champignons',         8.00,  'Entrées'),
-('Entrecôte grillée',        'Entrecôte 300g, frites maison et salade verte',    22.00, 'Plats'),
-('Filet de saumon',          'Saumon rôti, purée de patates douces et légumes',  19.50, 'Plats'),
-('Risotto aux champignons',  'Risotto crémeux aux cèpes et parmesan',            16.00, 'Plats'),
-('Burger maison',            'Steak haché, cheddar, bacon, sauce secrète',       15.00, 'Plats'),
-('Confit de canard',         'Cuisse de canard confite, pommes sarladaises',     20.00, 'Plats'),
-('Crème brûlée',             'Crème vanille caramélisée au chalumeau',            9.00,  'Desserts'),
-('Fondant au chocolat',      'Cœur coulant au chocolat noir 70%',                10.00, 'Desserts'),
-('Tarte tatin',              'Tarte aux pommes caramélisées, crème fraîche',      9.50,  'Desserts'),
-('Mousse au chocolat',       'Mousse légère au chocolat noir maison',             8.00,  'Desserts'),
-('Eau minérale (50cl)',      'Evian ou Badoit',                                   3.50,  'Boissons'),
-('Coca-Cola',                'Coca-Cola classique 33cl',                           4.00,  'Boissons'),
-('Jus d\'orange frais',      'Orange pressée minute',                             5.00,  'Boissons'),
-('Café expresso',            'Café arabica serré',                                2.50,  'Boissons'),
-('Thé parfumé',              'Sélection de thés : Earl Grey, menthe, jasmin',     3.50,  'Boissons');
+INSERT INTO menu_items (name, description, price) VALUES
+('Soupe à l\'oignon',       'Soupe gratinée traditionnelle au fromage',          8.50),
+('Salade César',             'Salade romaine, poulet grillé, parmesan, croûtons', 10.00),
+('Terrine de campagne',      'Terrine maison servie avec cornichons et pain',     9.00),
+('Œuf cocotte',              'Œuf cocotte à la crème et aux champignons',         8.00),
+('Entrecôte grillée',        'Entrecôte 300g, frites maison et salade verte',    22.00),
+('Filet de saumon',          'Saumon rôti, purée de patates douces et légumes',  19.50),
+('Risotto aux champignons',  'Risotto crémeux aux cèpes et parmesan',            16.00),
+('Burger maison',            'Steak haché, cheddar, bacon, sauce secrète',       15.00),
+('Confit de canard',         'Cuisse de canard confite, pommes sarladaises',     20.00),
+('Crème brûlée',             'Crème vanille caramélisée au chalumeau',            9.00),
+('Fondant au chocolat',      'Cœur coulant au chocolat noir 70%',                10.00),
+('Tarte tatin',              'Tarte aux pommes caramélisées, crème fraîche',      9.50),
+('Mousse au chocolat',       'Mousse légère au chocolat noir maison',             8.00),
+('Eau minérale (50cl)',      'Evian ou Badoit',                                   3.50),
+('Coca-Cola',                'Coca-Cola classique 33cl',                           4.00),
+('Jus d\'orange frais',      'Orange pressée minute',                             5.00),
+('Café expresso',            'Café arabica serré',                                2.50),
+('Thé parfumé',              'Sélection de thés : Earl Grey, menthe, jasmin',     3.50);
 
 CREATE TABLE logs (
     id INT AUTO_INCREMENT PRIMARY KEY,
