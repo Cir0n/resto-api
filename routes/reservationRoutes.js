@@ -19,6 +19,13 @@ router.post('/create', authMiddleware, async (req, res) => {
     try {
         await connection.beginTransaction();
 
+        const [ferie] = await connection.execute('SELECT id FROM holidays WHERE date = ?', [date]);
+        if (ferie.length > 0) {
+            const err = new Error("Impossible de réserver pour cette date, c'est un jour férié.");
+            err.errorCode = 400;
+            throw err;
+        }
+
         // Récupère l'ID du créneau correspondant au jour et à l'heure demandés
         const [slots] = await connection.execute(
             'SELECT id FROM opening_slots WHERE day_of_week = ? AND time = ?',
@@ -26,7 +33,7 @@ router.post('/create', authMiddleware, async (req, res) => {
         );
 
         if (slots.length === 0) {
-            err = new Error("Ce créneau n'existe pas.");
+            const err = new Error("Ce créneau n'existe pas.");
             err.errorCode = 400;
             throw err;
         }
@@ -48,16 +55,16 @@ router.post('/create', authMiddleware, async (req, res) => {
         );
 
         if (parseInt(seats[0].remaining) < parseInt(number_of_people)) {
-            err = new Error("Il reste seulement " + seats[0].remaining + 
+            const err = new Error("Il reste seulement " + seats[0].remaining +
                 " places disponibles pour ce créneau contre les " + number_of_people + " places demandées.");
             err.errorCode = 400;
             throw err;
         }
-        
+
         const selectedTableIds = await assign(userId, connection, number_of_people, slotId, date);
 
         if (selectedTableIds?.status == 500) {
-            err = new Error(selectedTableIds.error);
+            const err = new Error(selectedTableIds.error);
             err.errorCode = 400;
             throw err;
         }
@@ -66,12 +73,12 @@ router.post('/create', authMiddleware, async (req, res) => {
 
         await connection.commit();
         res.status(201).json({ message: 'Réservation confirmée', reservationId, date: date, slotId, userId, tables: selectedTableIds });
-        
+
     } catch (error) {
         await connection.rollback();
-        await logAction(userId, 'ROLLBACK', null, 'WARN');
+        await logAction(userId ?? null, 'ROLLBACK', null, 'WARN');
         res.status(error.errorCode || 500).json({ error: error.message });
-        await logAction(userId, 'FAILED_RESERVATION', { error: error.message, reservationId:reservationId }, 'ERROR');
+        await logAction(userId ?? null, 'FAILED_RESERVATION', { error: error.message, reservationId:reservationId }, 'ERROR');
     } finally {
         connection.release();
     }
@@ -86,9 +93,9 @@ router.get('/', authMiddleware, isAdmin, async (req, res) => {
             JOIN users u ON r.user_id = u.id
             JOIN opening_slots os ON r.opening_slot_id = os.id`)
         res.json(reservations);
-        await logAction(req.user.id, 'SUCCESSFUL_RETRIEVAL_OF_RESERVATIONS', null, 'INFO');
+        await logAction(req?.user?.id, 'SUCCESSFUL_RETRIEVAL_OF_RESERVATIONS', null, 'INFO');
     } catch (error) {
-        await logAction(req.user.id, 'FAILED_TO_RETRIEVE_RESERVATIONS', { error: error.message }, 'ERROR');
+        await logAction(req?.user?.id, 'FAILED_TO_RETRIEVE_RESERVATIONS', { error: error.message }, 'ERROR');
         res.status(error.errorCode || 500).json({ error: error.message, reservationId:reservationId });
     }
 });
@@ -105,9 +112,9 @@ router.get('/my-reservations', authMiddleware, async (req, res) => {
         );
 
         res.json(reservations);
-        await logAction(req.user.id, 'SUCCESSFUL_RETRIEVAL_OF_MY_RESERVATIONS', null, 'INFO');
+        await logAction(req?.user?.id, 'SUCCESSFUL_RETRIEVAL_OF_MY_RESERVATIONS', null, 'INFO');
     } catch (error) {
-        await logAction(req.user.id, 'FAILED_TO_RETRIEVE_MY_RESERVATIONS', { error: error.message }, 'ERROR');
+        await logAction(req?.user?.id, 'FAILED_TO_RETRIEVE_MY_RESERVATIONS', { error: error.message }, 'ERROR');
         res.status(error.errorCode || 500).json({ error: error.message, reservationId:reservationId });
     }
 });
@@ -131,13 +138,21 @@ router.put('/:id', authMiddleware, async (req, res) => {
         const date = req.body.date ? new Date(req.body.date) : rows[0].date;
         const day_of_week = days[date.getDay()];
 
+        // Vérification que la nouvelle date n'est pas un jour férié
+        const [ferie] = await connection.execute('SELECT id FROM holidays WHERE date = ?', [date]);
+        if (ferie.length > 0) {
+            const err = new Error("Impossible de modifier la réservation pour cette date, c'est un jour férié.");
+            err.errorCode = 400;
+            throw err;
+        }
+
         if (!rows[0]) {
-            err = new Error("Réservation introuvable pour cet ID.");
+            const err = new Error("Réservation introuvable pour cet ID.");
             err.errorCode = 400;
             throw err;
         }
         if (rows[0].status === 'cancelled') {
-            err = new Error("Impossible de modifier une réservation annulée.");
+            const err = new Error("Impossible de modifier une réservation annulée.");
             err.errorCode = 400;
             throw err;
         }
@@ -149,18 +164,18 @@ router.put('/:id', authMiddleware, async (req, res) => {
             [day_of_week, time]
         );
         if (!slots[0]) {
-            err = new Error("Ce créneau n'existe pas.");
+            const err = new Error("Ce créneau n'existe pas.");
             err.errorCode = 400;
             throw err;
         }
         const slotId = slots[0].id;
 
         await connection.execute('DELETE FROM reservation_tables WHERE reservation_id = ?', [reservationId]);
-        await logAction(req.user.id, 'SUCCESSFUL_DELETION_OF_RESERVATION_TABLES', { 
+        await logAction(req?.user?.id, 'SUCCESSFUL_DELETION_OF_RESERVATION_TABLES', {
             reservationId : reservationId
         }, 'INFO');
 
-        // Vérifier la disponibilité des tables pour le nouveau créneau 
+        // Vérifier la disponibilité des tables pour le nouveau créneau
         const [seats] = await connection.execute(
             `SELECT COALESCE(SUM(t.seats), 0) AS remaining
              FROM tables t
@@ -176,15 +191,14 @@ router.put('/:id', authMiddleware, async (req, res) => {
         );
 
         if (parseInt(seats[0].remaining) < parseInt(number_of_people)) {
-            err = new Error("Il reste seulement " + seats[0].remaining + 
+            const err = new Error("Il reste seulement " + seats[0].remaining +
                 " places disponibles pour ce créneau contre les " + number_of_people + " places demandées.");
             err.errorCode = 400;
             throw err;
         }
 
-
         // Ré-assigner les tables
-        const selectedTableIds = await assign(userId, connection, number_of_people, slotId, date);
+        const selectedTableIds = await assign(connection, number_of_people, slotId, date);
 
         // Mettre à jour la réservation principale
         await connection.execute(
@@ -193,10 +207,10 @@ router.put('/:id', authMiddleware, async (req, res) => {
              WHERE id = ?`,
             [date, slotId, number_of_people, note || null, reservationId]
         );
-        await logAction(req.user.id, 'SUCCESSFUL_UPDATE_OF_RESERVATION', { 
+        await logAction(req?.user?.id, 'SUCCESSFUL_UPDATE_OF_RESERVATION', {
             reservationId : reservationId,
             newSlotId: slotId,
-            newDate: date, 
+            newDate: date,
             newPeople: number_of_people,
             newNote: note ? note : null
         }, 'INFO');
@@ -208,7 +222,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
                 [reservationId, tableId]
             );
         }
-        await logAction(req.user.id, 'SUCCESSFUL_UPDATE_OF_RESERVATION_TABLES', { 
+        await logAction(req?.user?.id, 'SUCCESSFUL_UPDATE_OF_RESERVATION_TABLES', {
             reservationId : reservationId
         }, 'INFO');
 
@@ -217,9 +231,9 @@ router.put('/:id', authMiddleware, async (req, res) => {
 
     } catch (error) {
         await connection.rollback(); // En cas d'erreur, les anciennes tables sont restaurées en base
-        await logAction(req.user.id, 'ROLLBACK', null, 'WARN');
+        await logAction(req?.user?.id, 'ROLLBACK', null, 'WARN');
         res.status(error.errorCode || 500).json({ error: error.message });
-        await logAction(req.user.id, 'FAILED_TO_UPDATE_RESERVATION', { error: error.message, reservationId: reservationId }, 'ERROR');
+        await logAction(req?.user?.id, 'FAILED_TO_UPDATE_RESERVATION', { error: error.message, reservationId: reservationId }, 'ERROR');
     } finally {
         connection.release();
     }
@@ -234,15 +248,15 @@ router.delete('/:id', authMiddleware, async (req, res) => {
             'SELECT status FROM reservations WHERE id = ? AND user_id = ?',
             [reservationId, userId]
         );
-        
+
         if (!rows[0]) {
-            err = new Error("Pas de réservation à cet ID.");
+            const err = new Error("Pas de réservation à cet ID.");
             err.errorCode = 400;
             throw err;
         }
 
         if (rows[0].status === 'cancelled') {
-            err = new Error("La réservation est déjà annulée.");
+            const err = new Error("La réservation est déjà annulée.");
             err.errorCode = 400;
             throw err;
         }
@@ -252,10 +266,10 @@ router.delete('/:id', authMiddleware, async (req, res) => {
             [reservationId, userId]
         );
         res.status(200).json({ message: 'Réservation annulée avec succès' });
-        await logAction(userId, 'SUCCESSFUL_CANCEL_RESERVATION', { reservationId: reservationId }, 'INFO');
+        await logAction(userId ?? null, 'SUCCESSFUL_CANCEL_RESERVATION', { reservationId: reservationId }, 'INFO');
     } catch (error) {
         res.status(error.errorCode || 500).json({ error: error.message});
-        await logAction(userId, 'FAILED_TO_CANCEL_RESERVATION', { error: error.message, reservationId:reservationId }, 'ERROR');
+        await logAction(userId ?? null, 'FAILED_TO_CANCEL_RESERVATION', { error: error.message, reservationId:reservationId }, 'ERROR');
     }
 });
 
@@ -270,19 +284,19 @@ router.patch('/:id/validate', authMiddleware, isAdmin, async (req, res) => {
         );
 
         if (!rows[0]) {
-            err = new Error("Pas de réservation à cet ID.");
+            const err = new Error("Pas de réservation à cet ID.");
             err.errorCode = 400;
             throw err;
         }
 
         if (rows[0].status === 'cancelled') {
-            err = new Error("Impossible de valider une réservation annulée.");
+            const err = new Error("Impossible de valider une réservation annulée.");
             err.errorCode = 400;
             throw err;
         }
 
         if (rows[0].status === 'confirmed') {
-            err = new Error("La réservation est déjà validée.");
+            const err = new Error("La réservation est déjà validée.");
             err.errorCode = 400;
             throw err;
         }
@@ -292,11 +306,11 @@ router.patch('/:id/validate', authMiddleware, isAdmin, async (req, res) => {
             [reservationId]
         );
         res.status(200).json({ message: 'Réservation validée avec succès.' });
-        await logAction(userId, 'SUCCESSFUL_VALIDATE_RESERVATION', { reservationId: reservationId }, 'INFO');
+        await logAction(userId ?? null, 'SUCCESSFUL_VALIDATE_RESERVATION', { reservationId: reservationId }, 'INFO');
 
     } catch (error) {
         res.status(error.errorCode || 500).json({ error: error.message });
-        await logAction(userId, 'FAILED_TO_VALIDATE_RESERVATION', { error: error.message, reservationId:reservationId }, 'ERROR');
+        await logAction(userId ?? null, 'FAILED_TO_VALIDATE_RESERVATION', { error: error.message, reservationId:reservationId }, 'ERROR');
     }
 });
 

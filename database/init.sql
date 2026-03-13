@@ -163,3 +163,9 @@ CREATE TABLE logs (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
+
+Create TABLE holidays (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    date DATE NOT NULL UNIQUE,
+    description VARCHAR(255)
+);

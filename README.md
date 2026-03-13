@@ -1,126 +1,114 @@
-# 🍽️ Resto API — API de Réservation de Restaurant
+# Resto API
 
-API REST complète pour la gestion d'un restaurant fictif, développée avec **Node.js**, **Express** et **MySQL**.
+API REST pour la gestion d'un restaurant, developpee avec **Node.js**, **Express 5** et **MySQL**.
 
-## 📋 Description
+## Description
 
-Resto API est une application backend permettant de gérer :
-- L'**authentification** des utilisateurs (clients et admins)
-- Les **réservations** avec attribution automatique des tables
-- Le **menu** du restaurant (consultable sans compte)
-- Les **tables** et leur disponibilité par créneau horaire
-- Les **créneaux d'ouverture** personnalisés
+Resto API permet de gerer :
+- **Authentification** des utilisateurs (clients et admins) via JWT
+- **Reservations** avec attribution automatique des tables (algorithme d'optimisation)
+- **Menu** du restaurant (consultable sans compte, filtrable par categorie)
+- **Jours feries** (blocage automatique des reservations)
+- **Logging** des actions en base de donnees et en console
 
 ---
 
-## 🛠️ Stack technique
+## Stack technique
 
 - **Runtime :** Node.js
-- **Framework :** Express.js
-- **Base de données :** MySQL
+- **Framework :** Express.js v5
+- **Base de donnees :** MySQL (mysql2/promise)
 - **Authentification :** JWT (jsonwebtoken) + bcrypt
 - **Validation :** express-validator
 - **Variables d'environnement :** dotenv
 
 ---
 
-## 📁 Structure du projet
+## Structure du projet
 
 ```
 resto-api/
-├── server.js                # Point d'entrée
-├── .env                     # Variables d'environnement
-├── .env.example             # Template des variables
+├── server.js                    # Point d'entree
 ├── package.json
-├── database/
-│   └── init.sql             # Script de création des tables + seed
+├── .env                         # Variables d'environnement (non versionne)
+├── .gitignore
+├── resto-api.postman_collection.json  # Collection Postman
 ├── config/
-│   └── db.js                # Connexion MySQL
+│   └── db.js                    # Pool de connexion MySQL
+├── database/
+│   └── init.sql                 # Schema + seed de la BDD
 ├── middlewares/
-│   ├── authMiddleware.js    # Vérification JWT
-│   └── isAdmin.js           # Vérification rôle admin
+│   ├── authMiddleware.js        # Verification JWT
+│   └── isAdmin.js               # Verification role admin
 ├── routes/
-│   ├── authRoutes.js
-│   ├── reservationRoutes.js
-│   ├── menuRoutes.js
-├── controllers/
-│   ├── authController.js
-│   ├── reservationController.js
-│   ├── menuController.js
-│   └── tableController.js
-└── business/
-    ├── reservationManager.js # Logique métier pour les réservations
-    └── tableManager.js       # Logique métier pour les tables
+│   ├── authRoutes.js            # /api/auth    — inscription, connexion
+│   ├── reservationRoutes.js     # /api/reservations — CRUD reservations
+│   ├── menuRoutes.js            # /api/menu    — consultation du menu
+│   └── ferieRoutes.js           # /api/ferie   — gestion des jours feries
+├── business/
+│   ├── reservationManager.js    # Creation de reservation en BDD
+│   └── tableManager.js          # Algorithme d'assignation des tables
+└── Utils/
+    └── logger.js                # Logging console + BDD
 ```
 
 ---
 
-## ⚙️ Installation
+## Installation
 
-### Prérequis
+### Prerequis
 
 - Node.js (v18+)
 - MySQL (v8+)
 - npm
 
-### Étapes
+### Etapes
 
 ```bash
 # 1. Cloner le repo
-git clone https://github.com/votre-groupe/resto-api.git
+git clone https://github.com/Cir0n/resto-api.git
 cd resto-api
 
-# 2. Installer les dépendances
-npm install express mysql2 dotenv bcryptjs jsonwebtoken express-validator
+# 2. Installer les dependances
+npm install
 
 # 3. Configurer les variables d'environnement
 cp .env.example .env
-# Éditer le fichier .env avec vos paramètres
+# Editer le fichier .env avec vos parametres
 
-# 4. Créer la base de données
-aller dans le fichier database/init.sql
+# 4. Creer la base de donnees
+# En shell (PowerShell)
+Get-Content database/init.sql | mysql -u root -P <votre_port_database>
+# En cmd
+mysql -u root -P <votre_port_database> < database/init.sql
 
 # 5. Lancer le serveur
 node server.js
-
 ```
 
 ### Variables d'environnement (.env)
 
 ```env
-PORT=3000
+# SERVER
+PORT=3302
+
+# DATABASE
 DB_HOST=localhost
 DB_USER=root
-DB_PASSWORD=votre_mot_de_passe
+DB_PASSWORD=""
 DB_NAME=resto_api
+DB_PORT=3306
+
+# JWT
 JWT_SECRET=votre_secret_jwt
-JWT_EXPIRES_IN=24h
+JWT_EXPIRES_IN=1h
 ```
 
 ---
 
-## 📦 Installation des dépendances
-Si vous partez d'un projet vide ou si vous souhaitez réinstaller manuellement les modules nécessaires, exécutez la commande suivante :
+## Comptes de test
 
-```bash
-npm install express mysql2 dotenv bcryptjs jsonwebtoken express-validator
-```
-
-Détails des paquets installés :
-
-express : Framework web pour construire l'API.
-
-mysql2 : Client pour connecter et interroger la base de données MySQL.
-
-dotenv : Gestion des variables d'environnement (fichier .env).
-
-bcryptjs : Hachage sécurisé des mots de passe utilisateurs.
-
-jsonwebtoken : Génération et vérification des tokens JWT pour l'authentification.
-
-## 🔐 Comptes de test
-
-| Rôle   | Email              | Mot de passe |
+| Role   | Email              | Mot de passe |
 |--------|--------------------|--------------|
 | Admin  | admin@resto.com    | Admin123!    |
 | Client | marie@example.com  | Client123!   |
@@ -128,16 +116,16 @@ jsonwebtoken : Génération et vérification des tokens JWT pour l'authentificat
 
 ---
 
-## 📡 Routes de l'API
+## Routes de l'API
 
-### 1. Authentification
+### 1. Authentification — `/api/auth`
 
-| Méthode | Route     | Auth | Description                 |
-|---------|-----------|------|-----------------------------|
-| POST    | `/signup` | ❌   | Créer un compte utilisateur |
-| POST    | `/login`  | ❌   | Connexion + retour JWT      |
+| Methode | Route               | Auth | Description                 |
+|---------|----------------------|------|-----------------------------|
+| POST    | `/api/auth/signup`   | Non  | Creer un compte utilisateur |
+| POST    | `/api/auth/login`    | Non  | Connexion + retour JWT      |
 
-**POST /signup** — Créer un compte
+**POST /api/auth/signup**
 
 ```json
 // Request body
@@ -151,18 +139,12 @@ jsonwebtoken : Génération et vérification des tokens JWT pour l'authentificat
 
 // Response 201
 {
-  "message": "Compte créé avec succès",
-  "user": {
-    "id": 3,
-    "email": "jean@example.com",
-    "fname": "Jean",
-    "lname": "Dupont",
-    "role": "client"
-  }
+  "message": "User created successfully",
+  "userId": 4
 }
 ```
 
-**POST /login** — Connexion
+**POST /api/auth/login**
 
 ```json
 // Request body
@@ -173,223 +155,169 @@ jsonwebtoken : Génération et vérification des tokens JWT pour l'authentificat
 
 // Response 200
 {
-  "message": "Connexion réussie",
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6..."
 }
 ```
 
 ---
 
-### 2. Réservations
+### 2. Reservations — `/api/reservations`
 
-| Méthode | Route                          | Auth   | Description                          |
-|---------|--------------------------------|--------|--------------------------------------|
-| GET     | `/reservations`                | Admin  | Toutes les réservations              |
-| GET     | `/my-reservations`             | Client | Ses propres réservations             |
-| POST    | `/reservations`                | Client | Créer une réservation                |
-| PUT     | `/reservations/:id`            | Client | Modifier (si status = pending)       |
-| DELETE  | `/reservations/:id`            | Client | Annuler une réservation              |
-| PATCH   | `/reservations/:id/validate`   | Admin  | Confirmer une réservation            |
+| Methode | Route                                   | Auth   | Description                     |
+|---------|-----------------------------------------|--------|---------------------------------|
+| POST    | `/api/reservations/create`              | Client | Creer une reservation           |
+| GET     | `/api/reservations`                     | Admin  | Toutes les reservations         |
+| GET     | `/api/reservations/my-reservations`     | Client | Ses propres reservations        |
+| PUT     | `/api/reservations/:id`                 | Client | Modifier une reservation        |
+| DELETE  | `/api/reservations/:id`                 | Client | Annuler une reservation         |
+| PATCH   | `/api/reservations/:id/validate`        | Admin  | Confirmer une reservation       |
 
-**POST /reservations** — Créer une réservation
+**POST /api/reservations/create**
 
 ```json
-// Request body
-// Header: Authorization: Bearer <token>
+// Request body — Header: Authorization: Bearer <token>
 {
   "number_of_people": 5,
   "date": "2026-06-20",
-  "time": "20:00",
-  "note": "Anniversaire, si possible près de la fenêtre"
+  "time": "20:30",
+  "note": "Anniversaire, si possible pres de la fenetre"
 }
 
 // Response 201
 {
-  "message": "Réservation créée avec succès",
-  "reservation": {
-    "id": 1,
-    "user_id": 3,
-    "number_of_people": 5,
-    "date": "2026-06-20",
-    "time": "20:00",
-    "status": "pending",
-    "note": "Anniversaire, si possible près de la fenêtre",
-    "tables": [
-      { "id": 2, "seats": 4 },
-      { "id": 5, "seats": 2 }
-    ]
-  }
+  "message": "Reservation confirmee",
+  "reservationId": 1,
+  "date": "2026-06-20",
+  "slotId": 6,
+  "userId": 3,
+  "tables": [8, 4]
 }
 ```
 
-**PUT /reservations/:id** — Modifier une réservation
+L'algorithme assigne automatiquement les tables en privilegiant les tables dont la capacite correspond au mieux au nombre de personnes. La reservation est bloquee si la date tombe sur un jour ferie.
+
+**PUT /api/reservations/:id**
 
 ```json
 // Request body
 {
   "number_of_people": 3,
   "date": "2026-06-21",
-  "time": "19:00"
+  "time": "19:00",
+  "note": "Changement de plan"
 }
 
 // Response 200
 {
-  "message": "Réservation modifiée avec succès",
-  "reservation": { "..." }
-}
-
-// Response 403 (si déjà confirmée)
-{
-  "error": "Impossible de modifier une réservation confirmée"
+  "message": "Reservation mise a jour avec succes",
+  "tables": [5]
 }
 ```
 
-**PATCH /reservations/:id/validate** — Confirmer (admin)
+Seules les reservations non annulees peuvent etre modifiees. Les tables sont reassignees automatiquement.
+
+**PATCH /api/reservations/:id/validate** (Admin)
 
 ```json
 // Response 200
 {
-  "message": "Réservation confirmée",
-  "reservation": {
+  "message": "Reservation validee avec succes."
+}
+```
+
+**DELETE /api/reservations/:id**
+
+```json
+// Response 200
+{
+  "message": "Reservation annulee avec succes"
+}
+```
+
+**Statuts possibles :** `pending` (defaut) | `confirmed` (validee par admin) | `cancelled` (annulee)
+
+---
+
+### 3. Menu — `/api/menu`
+
+| Methode | Route                    | Auth | Description                       |
+|---------|--------------------------|------|-----------------------------------|
+| GET     | `/api/menu`              | Non  | Tous les plats du menu            |
+| GET     | `/api/menu/:categoryId`  | Non  | Plats filtres par categorie       |
+
+**GET /api/menu**
+
+```json
+// Response 200
+[
+  {
     "id": 1,
-    "status": "confirmed"
-  }
-}
+    "name": "Soupe a l'oignon",
+    "description": "Soupe gratinee traditionnelle au fromage",
+    "price": 8.50
+  },
+  ...
+]
 ```
 
-**DELETE /reservations/:id** — Annuler
+---
+
+### 4. Jours feries — `/api/ferie`
+
+| Methode | Route                    | Auth   | Description                    |
+|---------|--------------------------|--------|--------------------------------|
+| GET     | `/api/ferie`             | Client | Lister les jours feries        |
+| GET     | `/api/ferie/:date`       | Client | Detail d'un jour ferie         |
+| POST    | `/api/ferie/create`      | Admin  | Ajouter un jour ferie          |
+| DELETE  | `/api/ferie/:date`       | Admin  | Supprimer un jour ferie        |
+
+**POST /api/ferie/create** (Admin)
 
 ```json
-// Response 200
+// Request body
 {
-  "message": "Réservation annulée",
-  "reservation": {
-    "id": 1,
-    "status": "cancelled"
-  }
+  "date": "2026-12-25",
+  "description": "Noel"
+}
+
+// Response 201
+{
+  "id": 1,
+  "date": "2026-12-25",
+  "description": "Noel"
 }
 ```
 
-**Statuts possibles d'une réservation :**
-- `pending` — en attente (par défaut à la création)
-- `confirmed` — confirmée par un admin
-- `cancelled` — annulée par le client ou l'admin
+Les reservations sont automatiquement bloquees pour les dates marquees comme feriees.
 
 ---
 
-### 3. Menu
+## Authentification
 
-| Méthode | Route        | Auth  | Description              |
-|---------|--------------|-------|--------------------------|
-| GET     | `/menu`      | ❌    | Consulter le menu        |
-| POST    | `/menu`      | Admin | Ajouter un plat          |
-| PUT     | `/menu/:id`  | Admin | Modifier un plat         |
-| DELETE  | `/menu/:id`  | Admin | Supprimer un plat        |
-
-**GET /menu** — Consulter le menu
-
-```json
-// Response 200
-{
-  "menu": [
-    {
-      "category": "Entrées",
-      "items": [
-        {
-          "id": 1,
-          "name": "Soupe à l'oignon",
-          "description": "Soupe gratinée traditionnelle",
-          "price": 8.50,
-          "category": "Entrées"
-        }
-      ]
-    },
-    {
-      "category": "Plats",
-      "items": []
-    },
-    {
-      "category": "Desserts",
-      "items": []
-    },
-    {
-      "category": "Boissons",
-      "items": []
-    }
-  ]
-}
-```
-
-**GET /menu?category=desserts&max_price=15** — Filtrer le menu
-
-```json
-// Response 200
-{
-  "items": [
-    {
-      "id": 8,
-      "name": "Crème brûlée",
-      "description": "Crème vanille caramélisée",
-      "price": 9.00,
-      "category": "Desserts"
-    }
-  ]
-}
-```
-
----
-
-### 4. Tables (Admin)
-
-| Méthode | Route         | Auth  | Description               |
-|---------|---------------|-------|---------------------------|
-| GET     | `/tables`     | Admin | Liste des tables          |
-| POST    | `/tables`     | Admin | Ajouter une table         |
-| PUT     | `/tables/:id` | Admin | Modifier une table        |
-| DELETE  | `/tables/:id` | Admin | Supprimer une table       |
-
----
-
-### 5. Disponibilité & Créneaux (Bonus)
-
-| Méthode | Route                           | Auth  | Description                           |
-|---------|---------------------------------|-------|---------------------------------------|
-| GET     | `/availability?date=2026-06-20` | ❌    | Créneaux disponibles à une date       |
-| POST    | `/opening-slots`                | Admin | Ajouter un créneau                    |
-| DELETE  | `/opening-slots/:id`            | Admin | Supprimer un créneau                  |
-
----
-
-## 🔒 Authentification
-
-Toutes les routes protégées nécessitent un header `Authorization` :
+Toutes les routes protegees necessitent un header `Authorization` :
 
 ```
 Authorization: Bearer <votre_token_jwt>
 ```
 
-Conseil: setup une collection de requetes parent avec `Authorization: Bearer <votre_token_jwt>`,
-et toutes les requetes enfant en `inherit auth from parent`.
-Le token est obtenu via `POST /login`.
+Le token est obtenu via `POST /api/auth/login` et expire apres 1h.
 
 ---
 
-## ❌ Gestion des erreurs
+## Gestion des erreurs
 
-L'API retourne des codes HTTP cohérents :
+| Code | Signification                                    |
+|------|--------------------------------------------------|
+| 200  | Succes                                           |
+| 201  | Ressource creee                                  |
+| 400  | Requete invalide (champs manquants, ferie, etc.) |
+| 401  | Non authentifie (token manquant)                  |
+| 403  | Acces interdit (token invalide ou role insuffisant) |
+| 404  | Ressource non trouvee                            |
+| 409  | Conflit (email deja utilise)                      |
+| 500  | Erreur serveur                                   |
 
-| Code | Signification                                              |
-|------|------------------------------------------------------------|
-| 200  | Succès                                                     |
-| 201  | Ressource créée                                            |
-| 400  | Requête invalide (champs manquants, données incorrectes)   |
-| 401  | Non authentifié (token manquant ou invalide)               |
-| 403  | Accès interdit (rôle insuffisant)                          |
-| 404  | Ressource non trouvée                                      |
-| 409  | Conflit (créneau indisponible, email déjà utilisé)         |
-| 500  | Erreur serveur                                             |
-
-Format standard des erreurs :
+Format standard :
 
 ```json
 {
@@ -399,31 +327,50 @@ Format standard des erreurs :
 
 ---
 
-## 🗄️ Base de données
+## Base de donnees
 
-### Schéma des tables
+### Schema
 
-- **users** — id, email, password_hash, fname, lname, phone, role
-- **reservations** — id, user_id, number_of_people, date, time, status, note
-- **tables** — id, seats
-- **reservation_tables** — reservation_id, table_id
+- **users** — id, email, password_hash, fname, lname, phone, role, created_at
+- **tables** — id, seats, label
+- **opening_slots** — id, day_of_week, time, comment (creneaux uniques par jour+heure)
+- **reservations** — id, user_id, opening_slot_id, date, number_of_people, status, note, created_at, updated_at
+- **reservation_tables** — reservation_id, table_id (table de liaison)
 - **menu_items** — id, name, description, price, category, image
-- **opening_slots** — id, day_of_week, time, is_available, comment
+- **holidays** — id, date, description
+- **logs** — id, user_id, action, details, created_at
 
-Le fichier `database/init.sql` contient le script complet de création et les données de seed.
+Le fichier `database/init.sql` contient le schema complet et les donnees de seed (utilisateurs, tables, creneaux, menu).
+
+### Tables disponibles (seed)
+
+8 tables : 3x2 places, 3x4 places, 2x6 places — capacite totale de 30 couverts par creneau.
+
+### Creneaux d'ouverture (seed)
+
+| Jour      | Creneaux        |
+|-----------|-----------------|
+| Lundi     | 12:00, 19:00    |
+| Mardi     | 12:00, 19:00    |
+| Mercredi  | 13:00, 20:30    |
+| Jeudi     | 13:00, 19:00    |
+| Vendredi  | 12:00, 20:30    |
+| Samedi    | 19:00, 21:30    |
+| Dimanche  | 12:00           |
 
 ---
 
-## 🧪 Tester l'API
+## Tester l'API
 
-1. Importer la collection Postman (si fournie) ou utiliser Thunder Client
-2. Se connecter avec un compte de test via `POST /login`
-3. Copier le token JWT retourné
-4. Ajouter le header `Authorization: Bearer <token>` sur les routes protégées
-5. Tester les différents endpoints
+Une collection Postman est fournie (`resto-api.postman_collection.json`). Sinon :
+
+1. Lancer le serveur avec `node server.js`
+2. Se connecter via `POST /api/auth/login` avec un compte de test
+3. Copier le token JWT retourne
+4. Ajouter le header `Authorization: Bearer <token>` sur les routes protegees
 
 ---
 
-## 📄 Licence
+## Licence
 
-Projet réalisé dans le cadre d'un projet pédagogique — API avec Node.js.
+Projet realise dans le cadre d'un projet pedagogique.
