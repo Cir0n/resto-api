@@ -84,21 +84,54 @@ router.post('/create', authMiddleware, async (req, res) => {
     }
 });
 
-
 router.get('/', authMiddleware, isAdmin, async (req, res) => {
+
+    const { date, status, sort } = req.query;
+
+    let query = `
+        SELECT r.id, r.date, os.day_of_week, os.time, r.number_of_people, r.note, r.status, u.fname, u.lname
+        FROM reservations r
+        JOIN users u ON r.user_id = u.id
+        JOIN opening_slots os ON r.opening_slot_id = os.id
+        WHERE 1=1
+    `;
+
+    const params = [];
+
+    if (date) {
+        query += " AND r.date = ?";
+        params.push(date);
+    }
+
+    if (status) {
+        query += " AND r.status = ?";
+        params.push(status);
+    }
+
+    if (sort) {
+        const allowedSort = ["date", "status", "number_of_people"];
+        if (allowedSort.includes(sort)) {
+            query += ` ORDER BY r.${sort}`;
+        }
+    }
+
     try {
-        const [reservations] = await pool.query(`
-            SELECT r.id, r.date, os.day_of_week, os.time, r.number_of_people, r.note, r.status, u.fname, u.lname
-            FROM reservations r
-            JOIN users u ON r.user_id = u.id
-            JOIN opening_slots os ON r.opening_slot_id = os.id`)
+        await logAction('Requête jouée :', query);
+        const [reservations] = await pool.query(query, params);
+
         res.json(reservations);
+
         await logAction(req?.user?.id, 'SUCCESSFUL_RETRIEVAL_OF_RESERVATIONS', null, 'INFO');
+
     } catch (error) {
+
         await logAction(req?.user?.id, 'FAILED_TO_RETRIEVE_RESERVATIONS', { error: error.message }, 'ERROR');
-        res.status(error.errorCode || 500).json({ error: error.message, reservationId:reservationId });
+
+        res.status(500).json({ error: error.message });
+
     }
 });
+
 
 router.get('/my-reservations', authMiddleware, async (req, res) => {
     const userId = req.user.id;

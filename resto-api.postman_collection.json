@@ -1,10 +1,10 @@
 {
   "info": {
-    "_postman_id": "c941d003-569d-4990-8278-8f81b8a20239",
+    "_postman_id": "92970dd0-c643-49f5-bdec-28a2cccf9416",
     "name": "resto-api",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "48881756",
-    "_collection_link": "https://go.postman.co/collection/48881756-c941d003-569d-4990-8278-8f81b8a20239?source=collection_link"
+    "_exporter_id": "52353360",
+    "_collection_link": "https://go.postman.co/collection/52353360-92970dd0-c643-49f5-bdec-28a2cccf9416?source=collection_link"
   },
   "item": [
     {
@@ -17,7 +17,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"email\": \"marie@example.com\",\r\n    \"password\": \"Client123!\"\r\n    //\"email\": \"admin@resto.com\",\r\n    //\"password\": \"Admin123!\"\r\n}",
+              "raw": "{\r\n    \"email\": \"admin@resto.com\",\r\n    \"password\": \"Admin123!\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -47,6 +47,26 @@
       "item": [
         {
           "name": "Récupérer les réservations ADMIN(GET /)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3302/api/reservations",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3302",
+              "path": [
+                "api",
+                "reservations"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Récupérer les réservations filtrées sur le statut + order by date",
           "request": {
             "method": "GET",
             "header": [],
@@ -122,7 +142,7 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "http://localhost:3302/api/reservations/:id",
+              "raw": "http://localhost:3302/api/reservations/22",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -131,13 +151,7 @@
               "path": [
                 "api",
                 "reservations",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "27"
-                }
+                "22"
               ]
             }
           },
@@ -155,7 +169,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"time\": \"12:00:00\",\n    \"number_of_people\": \"12\",\n    \"date\": \"March 25, 2026\",\n    \"note\": \"Allergie au lactose\"\n}",
+              "raw": "{\n    \"time\": \"12:00:00\",\n    \"number_of_people\": \"12\",\n    \"date\": \"March 09, 2026\",\n  \"note\": \"Allergie au lactose\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -163,7 +177,7 @@
               }
             },
             "url": {
-              "raw": "http://localhost:3302/api/reservations/:id",
+              "raw": "http://localhost:3302/api/reservations/1",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -172,13 +186,7 @@
               "path": [
                 "api",
                 "reservations",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "4"
-                }
+                "1"
               ]
             }
           },
@@ -189,6 +197,15 @@
           "request": {
             "method": "PATCH",
             "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            },
             "url": {
               "raw": "http://localhost:3302/api/reservations/:id/validate",
               "protocol": "http",
@@ -205,7 +222,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "8"
+                  "value": ""
                 }
               ]
             }
@@ -236,45 +253,14 @@
             }
           },
           "response": []
-        }
-      ]
-    },
-    {
-      "name": "ferie",
-      "item": [
-        {
-          "name": "Récuperer les jours feriés (GET /)",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "http://localhost:3302/api/ferie/",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "3302",
-              "path": [
-                "api",
-                "ferie",
-                ""
-              ]
-            }
-          },
-          "response": []
         },
         {
-          "name": "Récuperer un jour ferié (GET /:date)",
+          "name": "Récupérer les desserts (GET /)",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:3302/api/ferie/:date",
+              "raw": "http://localhost:3302/api/menu",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -282,35 +268,19 @@
               "port": "3302",
               "path": [
                 "api",
-                "ferie",
-                ":date"
-              ],
-              "variable": [
-                {
-                  "key": "date",
-                  "value": "March 25, 2026"
-                }
+                "menu"
               ]
             }
           },
           "response": []
         },
         {
-          "name": "Créer un jour ferié (PUT /CREATE)",
+          "name": "Récupérer les plats avec prix max (GET /) Copy",
           "request": {
-            "method": "POST",
+            "method": "GET",
             "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n    \"date\": \"March 25, 2026\",\r\n    \"description\": \"pentecote\"\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
             "url": {
-              "raw": "http://localhost:3302/api/ferie/create",
+              "raw": "http://localhost:3302/api/menu",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -318,35 +288,7 @@
               "port": "3302",
               "path": [
                 "api",
-                "ferie",
-                "create"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Supprimer un jour ferié (DELETE /:date)",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:3302/api/ferie/:date",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "3302",
-              "path": [
-                "api",
-                "ferie",
-                ":date"
-              ],
-              "variable": [
-                {
-                  "key": "date",
-                  "value": "March 25, 2026"
-                }
+                "menu"
               ]
             }
           },
@@ -360,7 +302,7 @@
     "bearer": [
       {
         "key": "token",
-        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInJvbGUiOiJjbGllbnQiLCJpYXQiOjE3NzMzMTU2NzYsImV4cCI6MTc3MzMxOTI3Nn0.HgZDE62zktNq7Ho8hyGUMW7T-yAC8actoybo_AFz134",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3MzM5MjgyNCwiZXhwIjoxNzczMzk2NDI0fQ.ylSyGhATt7ywKrkQr6IxSNk8dbZOpIGSbM37r7UEk7c",
         "type": "string"
       }
     ]
