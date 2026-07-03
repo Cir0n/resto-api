@@ -18,7 +18,7 @@ router.get('/', authMiddleware, async (req, res) => {
 });
 
 router.get('/:date', authMiddleware, async (req, res) => {
-       const date = new Date(req.params.date);;
+    const date = req.params.date;
     try {
         const [feries] = await pool.query('SELECT id, date, description FROM holidays WHERE date = ?', [date]);
         if (feries.length === 0) {
@@ -37,7 +37,7 @@ router.get('/:date', authMiddleware, async (req, res) => {
 router.post('/create', authMiddleware, isAdmin, async (req, res) => {
     try {
         const description = req.body.description;
-        const date = new Date(req.body.date);
+        const date = req.body.date;
         if (!date) {
             const err = new Error("No date was provided.");
             err.errorCode = 400;
@@ -60,7 +60,7 @@ router.post('/create', authMiddleware, isAdmin, async (req, res) => {
 
 router.delete('/:date', authMiddleware, isAdmin, async (req, res) => {
     try {
-        const date = new Date(req.params.date);
+        const date = req.params.date;
         const [result] = await pool.query('DELETE FROM holidays WHERE date = ?', [date]);
         if (result.affectedRows === 0) {
             const err = new Error("Holiday not found.");

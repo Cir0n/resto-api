@@ -7,7 +7,7 @@ async function reserve(req, connection, selectedTableIds, slotId){
         // Crée la réservation
         const [resResult] = await connection.execute(
             'INSERT INTO reservations (user_id, date, number_of_people, opening_slot_id, note, status) VALUES (?, ?, ?, ?, ?, ?)',
-            [userId, new Date(date), number_of_people, slotId, note || null, "pending"]
+            [userId, date, number_of_people, slotId, note || null, "pending"]
         );
         const reservationId = resResult.insertId;
         await logAction(userId, 'Reservation_table_populated', {

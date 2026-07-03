@@ -1,6 +1,7 @@
 require('dotenv').config();
 const db = require('./config/db');
 const express = require('express');
+const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
 const reservationRoutes = require('./routes/reservationRoutes');
 const menuRoutes = require('./routes/menuRoutes');
@@ -10,6 +11,7 @@ const ferieRoutes = require('./routes/ferieRoutes');
 const app = express();
 const PORT = process.env.PORT;
 
+app.use(cors());
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);

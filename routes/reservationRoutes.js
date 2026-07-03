@@ -6,13 +6,11 @@ const { isAdmin } = require('../middlewares/isAdmin');
 const { assign } = require('../business/tableManager');
 const { reserve } = require('../business/reservationManager');
 const { logAction } = require('../Utils/logger');
-
-// mapper Date.getDay() vers jours de la semaine
-const days = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
+const { dayOfWeek } = require('../Utils/dateUtils');
 
 router.post('/create', authMiddleware, async (req, res) => {
     const { time, number_of_people } = req.body;
-    const date = new Date(req.body.date);
+    const date = req.body.date; // chaîne 'YYYY-MM-DD', ne pas convertir en Date (cf. Utils/dateUtils.js)
     const userId = req.user.id;
 
     const connection = await pool.getConnection(); // On récupère une connexion pour la transaction
@@ -29,7 +27,7 @@ router.post('/create', authMiddleware, async (req, res) => {
         // Récupère l'ID du créneau correspondant au jour et à l'heure demandés
         const [slots] = await connection.execute(
             'SELECT id FROM opening_slots WHERE day_of_week = ? AND time = ?',
-            [days[date.getDay()], time]
+            [dayOfWeek(date), time]
         );
 
         if (slots.length === 0) {
@@ -168,8 +166,8 @@ router.put('/:id', authMiddleware, async (req, res) => {
         const time = req.body.time ?? rows[0].time;
         const number_of_people = req.body.number_of_people ?? rows[0].number_of_people;
         const note = req.body.note ?? rows[0].note;
-        const date = req.body.date ? new Date(req.body.date) : rows[0].date;
-        const day_of_week = days[date.getDay()];
+        const date = req.body.date ?? rows[0].date; // chaîne 'YYYY-MM-DD'
+        const day_of_week = dayOfWeek(date);
 
         // Vérification que la nouvelle date n'est pas un jour férié
         const [ferie] = await connection.execute('SELECT id FROM holidays WHERE date = ?', [date]);
@@ -275,11 +273,15 @@ router.put('/:id', authMiddleware, async (req, res) => {
 router.delete('/:id', authMiddleware, async (req, res) => {
     const reservationId = req.params.id;
     const userId = req.user.id;
+    // Un admin peut annuler n'importe quelle réservation, un client uniquement les siennes.
+    const isAdminUser = req.user.role === 'admin';
     try {
 
         const [rows] = await pool.query(
-            'SELECT status FROM reservations WHERE id = ? AND user_id = ?',
-            [reservationId, userId]
+            isAdminUser
+                ? 'SELECT status FROM reservations WHERE id = ?'
+                : 'SELECT status FROM reservations WHERE id = ? AND user_id = ?',
+            isAdminUser ? [reservationId] : [reservationId, userId]
         );
 
         if (!rows[0]) {
@@ -287,6 +289,7 @@ router.delete('/:id', authMiddleware, async (req, res) => {
             err.errorCode = 400;
             throw err;
         }
+        
 
         if (rows[0].status === 'cancelled') {
             const err = new Error("La réservation est déjà annulée.");
@@ -295,8 +298,10 @@ router.delete('/:id', authMiddleware, async (req, res) => {
         }
 
         const [result] = await pool.query(
-            'UPDATE reservations SET status = "cancelled" WHERE id = ? AND user_id = ?',
-            [reservationId, userId]
+            isAdminUser
+                ? 'UPDATE reservations SET status = "cancelled" WHERE id = ?'
+                : 'UPDATE reservations SET status = "cancelled" WHERE id = ? AND user_id = ?',
+            isAdminUser ? [reservationId] : [reservationId, userId]
         );
         res.status(200).json({ message: 'Réservation annulée avec succès' });
         await logAction(userId ?? null, 'SUCCESSFUL_CANCEL_RESERVATION', { reservationId: reservationId }, 'INFO');
